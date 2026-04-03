@@ -27,7 +27,7 @@ func NewFx(pool *pgxpool.Pool) Repository {
 	})
 }
 
-func (p *Pgx) CreateAPost(ctx context.Context, animal *model.APost) (string, error) {
+func (p *Pgx) CreatePost(ctx context.Context, post *model.APost) (string, error) {
 	query := `
     INSERT INTO animals (
       organization_id, 
@@ -46,13 +46,13 @@ func (p *Pgx) CreateAPost(ctx context.Context, animal *model.APost) (string, err
 	err := p.pool.QueryRow(
 		ctx,
 		query,
-		animal.OrganizationID,
-		animal.Name,
-		animal.Age,
-		animal.Sex,
-		animal.Description,
-		animal.PhotoURL,
-		animal.Status,
+		post.OrganizationID,
+		post.Name,
+		post.Age,
+		post.Sex,
+		post.Description,
+		post.PhotoURL,
+		post.Status,
 	).Scan(&id)
 
 	if err != nil {

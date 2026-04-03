@@ -7,5 +7,5 @@ import (
 )
 
 type Repository interface {
-	CreatePost(ctx context.Context, post model.APost) (string, error)
+	CreatePost(ctx context.Context, post *model.APost) (string, error)
 }
