@@ -65,3 +65,9 @@ func (r *Pgx) UpdateStatus(ctx context.Context, id string, status string) error 
 	_, err := r.pool.Exec(ctx, query, status, id)
 	return err
 }
+
+func (r *Pgx) Delete(ctx context.Context, id string) error {
+	query := `DELETE FROM applications WHERE id = $1`
+	_, err := r.pool.Exec(ctx, query, id)
+	return err
+}

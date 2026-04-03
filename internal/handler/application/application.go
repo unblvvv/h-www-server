@@ -16,4 +16,5 @@ var FxModule = fx.Provide(
 	handler.AsFxRoute(NewUpdateHandler),
 	handler.AsFxRoute(NewListHandler),
 	handler.AsFxRoute(NewCreateHandler),
+	handler.AsFxRoute(NewDeleteHandler),
 )

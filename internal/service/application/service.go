@@ -33,3 +33,7 @@ func (s *Service) GetInbox(ctx context.Context, status *string, limit, offset in
 func (s *Service) ResolveApplication(ctx context.Context, id string, status string) error {
 	return s.repo.UpdateStatus(ctx, id, status)
 }
+
+func (s *Service) Delete(ctx context.Context, id string) error {
+	return s.repo.Delete(ctx, id)
+}
