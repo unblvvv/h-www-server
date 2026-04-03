@@ -8,24 +8,61 @@ import (
 	"github.com/bytedance/gopkg/util/logger"
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/danielgtaylor/huma/v2/adapters/humagin"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/unblvvv/h-www-server/internal/config"
+	"github.com/unblvvv/h-www-server/internal/handler"
+	authhandler "github.com/unblvvv/h-www-server/internal/handler/auth"
+	posthandler "github.com/unblvvv/h-www-server/internal/handler/post"
+	"github.com/unblvvv/h-www-server/internal/middleware"
 	"github.com/unblvvv/h-www-server/internal/repository"
+	"github.com/unblvvv/h-www-server/internal/repository/auth"
+	"github.com/unblvvv/h-www-server/internal/repository/post"
+	authservice "github.com/unblvvv/h-www-server/internal/service/auth"
+	postservice "github.com/unblvvv/h-www-server/internal/service/post"
 	"go.uber.org/fx"
 )
 
 func New() *fx.App {
 	return fx.New(
 		fx.Provide(
-			gin.New,
-
+			fx.Annotate(
+				auth.NewFx,
+				fx.As(new(auth.Repository)),
+			),
+			fx.Annotate(
+				post.NewFx,
+				fx.As(new(post.Repository)),
+			),
+		),
+		fx.Provide(
 			config.Load,
 			repository.NewDB,
 
+			authservice.New,
+			postservice.New,
+
 			NewHumaAPI,
+
+			func() *gin.Engine {
+				r := gin.Default()
+
+				r.Use(cors.New(cors.Config{
+					AllowOrigins:     []string{"*"},
+					AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
+					AllowHeaders:     []string{"*"},
+					ExposeHeaders:    []string{"Content-Length"},
+					AllowCredentials: true,
+				}))
+
+				return r
+			},
 		),
+		authhandler.FxModule,
+		posthandler.FxModule,
 		fx.Invoke(
 			startServer,
+			handler.RegisterRoutes,
 		),
 	)
 }
@@ -64,7 +101,7 @@ func NewHumaAPI(r *gin.Engine, cfg *config.Config) huma.API {
 
 	api := humagin.New(r, humaConfig)
 
-	//api.UseMiddleware(middleware.AuthMiddleware(api, cfg))
+	api.UseMiddleware(middleware.AuthMiddleware(api, cfg))
 
 	return api
 }
