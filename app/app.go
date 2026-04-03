@@ -10,22 +10,36 @@ import (
 	"github.com/danielgtaylor/huma/v2/adapters/humagin"
 	"github.com/gin-gonic/gin"
 	"github.com/unblvvv/h-www-server/internal/config"
+	"github.com/unblvvv/h-www-server/internal/handler"
+	authhandler "github.com/unblvvv/h-www-server/internal/handler/auth"
 	"github.com/unblvvv/h-www-server/internal/repository"
+	"github.com/unblvvv/h-www-server/internal/repository/auth"
+	authservice "github.com/unblvvv/h-www-server/internal/service/auth"
 	"go.uber.org/fx"
 )
 
 func New() *fx.App {
 	return fx.New(
 		fx.Provide(
+			fx.Annotate(
+				auth.NewFx,
+				fx.As(new(auth.Repository)),
+			),
+		),
+		fx.Provide(
 			gin.New,
 
 			config.Load,
 			repository.NewDB,
 
+			authservice.New,
+
 			NewHumaAPI,
 		),
+		authhandler.FxModule,
 		fx.Invoke(
 			startServer,
+			handler.RegisterRoutes,
 		),
 	)
 }
