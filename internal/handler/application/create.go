@@ -2,8 +2,10 @@ package application
 
 import (
 	"context"
+	"errors"
 
 	"github.com/danielgtaylor/huma/v2"
+	"github.com/jackc/pgx/v5/pgconn"
 	applicationservice "github.com/unblvvv/h-www-server/internal/service/application"
 )
 
@@ -38,12 +40,21 @@ func (h *CreateHandler) GetMeta() huma.Operation {
 		Path:        "/v1/applications",
 		Tags:        []string{"Public Applications"},
 		Description: "Submit an application to adopt an animal",
+		Security: []map[string][]string{
+			{"bearer": {}},
+		},
 	}
 }
 
 func (h *CreateHandler) Handle(ctx context.Context, input *CreateRequestDto) (*CreateResponseOutput, error) {
+	userID, ok := ctx.Value("userID").(string)
+	if !ok {
+		return nil, huma.Error401Unauthorized("Вы должны быть авторизованы")
+	}
+
 	err := h.service.CreateApplication(
 		ctx,
+		userID,
 		input.Body.AnimalID,
 		input.Body.Name,
 		input.Body.Email,
@@ -52,7 +63,11 @@ func (h *CreateHandler) Handle(ctx context.Context, input *CreateRequestDto) (*C
 	)
 
 	if err != nil {
-		return nil, huma.Error500InternalServerError("internal error", err)
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) && pgErr.Code == "23505" {
+			return nil, huma.Error409Conflict("you have already submitted an application for this animal", err)
+		}
+		return nil, err
 	}
 
 	return &CreateResponseOutput{

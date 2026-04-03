@@ -15,8 +15,9 @@ func New(repo application.Repository) *Service {
 	return &Service{repo: repo}
 }
 
-func (s *Service) CreateApplication(ctx context.Context, animalID, name, email, phone, message string) error {
+func (s *Service) CreateApplication(ctx context.Context, userID, animalID, name, email, phone, message string) error {
 	return s.repo.Create(ctx, &model.Application{
+		UserID:   userID,
 		AnimalID: animalID,
 		Name:     name,
 		Email:    email,

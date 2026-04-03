@@ -16,7 +16,7 @@ type UploadRequestDto struct {
 
 type UploadOutput struct {
 	Body struct {
-		URL string `json:"url" doc:"link to uploaded file"`
+		URLs []string `json:"urls" doc:"links to uploaded files"`
 	}
 }
 
@@ -47,31 +47,39 @@ func (h *Handler) Handle(ctx context.Context, input *UploadRequestDto) (*UploadO
 		return nil, huma.Error400BadRequest("file is required")
 	}
 
-	fileHeader := files[0]
-
-	file, err := fileHeader.Open()
-	if err != nil {
-		return nil, huma.Error400BadRequest("bad request", err)
-	}
-	defer file.Close()
-
-	ext := filepath.Ext(fileHeader.Filename)
-	filename := "photos/" + uuid.New().String() + ext
-
-	contentType := fileHeader.Header.Get("Content-Type")
-	if contentType == "" {
-		contentType = "image/jpeg"
+	if len(files) > 10 {
+		return nil, huma.Error400BadRequest("maximum 10 photos allowed")
 	}
 
-	fileURL, err := h.storage.UploadFile(ctx, file, filename, contentType)
-	if err != nil {
-		return nil, huma.Error500InternalServerError("cloudflare save error", err)
+	var urls []string
+
+	for _, fileHeader := range files {
+		file, err := fileHeader.Open()
+		if err != nil {
+			return nil, huma.Error400BadRequest("bad request", err)
+		}
+
+		ext := filepath.Ext(fileHeader.Filename)
+		filename := "photos/" + uuid.New().String() + ext
+
+		contentType := fileHeader.Header.Get("Content-Type")
+		if contentType == "" {
+			contentType = "image/jpeg"
+		}
+
+		fileURL, err := h.storage.UploadFile(ctx, file, filename, contentType)
+		file.Close()
+		if err != nil {
+			return nil, huma.Error500InternalServerError("cloudflare save error", err)
+		}
+
+		urls = append(urls, fileURL)
 	}
 
 	return &UploadOutput{
 		Body: struct {
-			URL string `json:"url" doc:"link to uploaded file"`
-		}{URL: fileURL},
+			URLs []string `json:"urls" doc:"links to uploaded files"`
+		}{URLs: urls},
 	}, nil
 }
 

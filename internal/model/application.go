@@ -4,6 +4,7 @@ import "time"
 
 type Application struct {
 	ID         string    `json:"id"`
+	UserID     string    `json:"user_id"`
 	AnimalID   string    `json:"animal_id"`
 	AnimalName string    `json:"animal_name,omitempty"`
 	Name       string    `json:"name"`

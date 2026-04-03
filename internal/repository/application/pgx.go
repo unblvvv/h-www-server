@@ -16,8 +16,9 @@ func NewFx(pool *pgxpool.Pool) Repository {
 }
 
 func (r *Pgx) Create(ctx context.Context, app *model.Application) error {
-	query := `INSERT INTO applications (animal_id, name, email, phone, message) VALUES ($1, $2, $3, $4, $5)`
-	_, err := r.pool.Exec(ctx, query, app.AnimalID, app.Name, app.Email, app.Phone, app.Message)
+	query := `INSERT INTO applications (user_id, animal_id, name, email, phone, message) 
+              VALUES ($1, $2, $3, $4, $5, $6)`
+	_, err := r.pool.Exec(ctx, query, app.UserID, app.AnimalID, app.Name, app.Email, app.Phone, app.Message)
 	return err
 }
 
@@ -33,7 +34,7 @@ func (r *Pgx) GetList(ctx context.Context, status *string, limit, offset int) ([
 
 	query := `
 		SELECT 
-			a.id, a.animal_id, an.name as animal_name, 
+			a.id, a.user_id, a.animal_id, an.name as animal_name, 
 			a.name, a.email, a.phone, a.message, a.status, a.created_at 
 		FROM applications a
 		JOIN animals an ON a.animal_id = an.id
@@ -49,7 +50,7 @@ func (r *Pgx) GetList(ctx context.Context, status *string, limit, offset int) ([
 
 	for rows.Next() {
 		var a model.Application
-		err := rows.Scan(&a.ID, &a.AnimalID, &a.AnimalName, &a.Name, &a.Email, &a.Phone, &a.Message, &a.Status, &a.CreatedAt)
+		err := rows.Scan(&a.ID, &a.UserID, &a.AnimalID, &a.AnimalName, &a.Name, &a.Email, &a.Phone, &a.Message, &a.Status, &a.CreatedAt)
 		if err != nil {
 			return nil, 0, err
 		}

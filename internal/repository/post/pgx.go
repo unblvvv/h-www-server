@@ -64,9 +64,14 @@ func (p *Pgx) CreatePost(ctx context.Context, post *model.APost) (string, error)
 }
 
 func (p *Pgx) DeletePost(ctx context.Context, id string) error {
-	query := `DELETE FROM animals WHERE id = $1`
+	tx, err := p.pool.Begin(ctx)
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback(ctx)
 
-	tag, err := p.pool.Exec(ctx, query, id)
+	query := `UPDATE animals SET deleted_at = NOW() WHERE id = $1`
+	tag, err := tx.Exec(ctx, query, id)
 	if err != nil {
 		return err
 	}
@@ -75,13 +80,20 @@ func (p *Pgx) DeletePost(ctx context.Context, id string) error {
 		return errors.New("post not found")
 	}
 
-	return nil
+	appQuery := `UPDATE applications SET status = 'rejected' WHERE animal_id = $1 AND status = 'new'`
+	_, err = tx.Exec(ctx, appQuery, id)
+	if err != nil {
+		return err
+	}
+
+	return tx.Commit(ctx)
 }
 
 func (p *Pgx) GetPost(ctx context.Context, limit, offset int) ([]model.APost, error) {
 	query := `
         SELECT id, organization_id, name, age, sex, description, photo_url, status, created_at, updated_at
         FROM animals
+        WHERE deleted_at IS NULL
         ORDER BY created_at DESC
         LIMIT $1 OFFSET $2
     `
