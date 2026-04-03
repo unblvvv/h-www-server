@@ -28,11 +28,11 @@ type CreatePostOutput struct {
 }
 
 type Post struct {
-	service *postservice.AService
+	service *postservice.Service
 	repo    post.Repository
 }
 
-func NewPost(service *postservice.AService, repo post.Repository) *Post {
+func NewPost(service *postservice.Service, repo post.Repository) *Post {
 	return &Post{service: service, repo: repo}
 }
 

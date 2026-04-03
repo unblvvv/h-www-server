@@ -8,6 +8,7 @@ import (
 	"github.com/bytedance/gopkg/util/logger"
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/danielgtaylor/huma/v2/adapters/humagin"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/unblvvv/h-www-server/internal/config"
 	"github.com/unblvvv/h-www-server/internal/handler"
@@ -35,8 +36,6 @@ func New() *fx.App {
 			),
 		),
 		fx.Provide(
-			gin.New,
-
 			config.Load,
 			repository.NewDB,
 
@@ -44,6 +43,20 @@ func New() *fx.App {
 			postservice.New,
 
 			NewHumaAPI,
+
+			func() *gin.Engine {
+				r := gin.Default()
+
+				r.Use(cors.New(cors.Config{
+					AllowOrigins:     []string{"*"},
+					AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
+					AllowHeaders:     []string{"*"},
+					ExposeHeaders:    []string{"Content-Length"},
+					AllowCredentials: true,
+				}))
+
+				return r
+			},
 		),
 		authhandler.FxModule,
 		posthandler.FxModule,
