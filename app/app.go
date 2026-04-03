@@ -12,13 +12,16 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/unblvvv/h-www-server/internal/config"
 	"github.com/unblvvv/h-www-server/internal/handler"
+	applicationhandler "github.com/unblvvv/h-www-server/internal/handler/application"
 	authhandler "github.com/unblvvv/h-www-server/internal/handler/auth"
 	posthandler "github.com/unblvvv/h-www-server/internal/handler/post"
 	"github.com/unblvvv/h-www-server/internal/handler/post/admin"
 	"github.com/unblvvv/h-www-server/internal/middleware"
 	"github.com/unblvvv/h-www-server/internal/repository"
+	"github.com/unblvvv/h-www-server/internal/repository/application"
 	"github.com/unblvvv/h-www-server/internal/repository/auth"
 	"github.com/unblvvv/h-www-server/internal/repository/post"
+	applicationservice "github.com/unblvvv/h-www-server/internal/service/application"
 	authservice "github.com/unblvvv/h-www-server/internal/service/auth"
 	postservice "github.com/unblvvv/h-www-server/internal/service/post"
 	"github.com/unblvvv/h-www-server/internal/service/storage"
@@ -36,6 +39,10 @@ func New() *fx.App {
 				post.NewFx,
 				fx.As(new(post.Repository)),
 			),
+			fx.Annotate(
+				application.NewFx,
+				fx.As(new(application.Repository)),
+			),
 		),
 		fx.Provide(
 			config.Load,
@@ -44,6 +51,7 @@ func New() *fx.App {
 			authservice.New,
 			postservice.New,
 			storage.New,
+			applicationservice.New,
 
 			NewHumaAPI,
 
@@ -65,6 +73,7 @@ func New() *fx.App {
 		authhandler.FxModule,
 		posthandler.FxModule,
 		admin.FxModule,
+		applicationhandler.FxModule,
 
 		fx.Invoke(
 			startServer,
