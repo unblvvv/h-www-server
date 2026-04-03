@@ -15,7 +15,7 @@ type CreateAnimalRequestDto struct {
 		Age         string        `json:"age" minLength:"1" maxLength:"50" doc:"age"`
 		Sex         model.ASex    `json:"sex" enum:"male,female,unknown" doc:"sex"`
 		Description string        `json:"description" minLength:"1" doc:"description"`
-		PhotoURL    *string       `json:"photo_url,omitempty" format:"uri" doc:"photo url (временно)"`
+		PhotoURLs    []string       `json:"photo_urls,omitempty" format:"uri" doc:"photo url (временно)"`
 		Status      model.AStatus `json:"status" enum:"available,adopted,treatment" default:"available" doc:"status (available,adopted,treatment)"`
 	}
 }
@@ -62,7 +62,7 @@ func (s *Post) Handler(ctx context.Context, input *CreateAnimalRequestDto) (*Cre
 		input.Body.Age,
 		input.Body.Sex,
 		input.Body.Description,
-		input.Body.PhotoURL,
+		input.Body.PhotoURLs,
 		input.Body.Status,
 	)
 

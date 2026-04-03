@@ -15,7 +15,7 @@ type UpdatePostRequestDto struct {
 		Age         string        `json:"age"`
 		Sex         model.ASex    `json:"sex"`
 		Description string        `json:"description"`
-		PhotoURL    *string       `json:"photo_url,omitempty"`
+		PhotoURLs    []string       `json:"photo_urls,omitempty"`
 		Status      model.AStatus `json:"status"`
 	}
 }
@@ -51,7 +51,7 @@ func (s *Update) Handler(ctx context.Context, input *UpdatePostRequestDto) (*Upd
 		Age:         input.Body.Age,
 		Sex:         input.Body.Sex,
 		Description: input.Body.Description,
-		PhotoURL:    input.Body.PhotoURL,
+		PhotoURLs:    input.Body.PhotoURLs,
 		Status:      input.Body.Status,
 	}
 

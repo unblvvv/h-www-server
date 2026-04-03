@@ -36,7 +36,7 @@ func (p *Pgx) CreatePost(ctx context.Context, post *model.APost) (string, error)
       age, 
       sex, 
       description, 
-      photo_url, 
+      photo_urls, 
       status
     )
     VALUES ($1, $2, $3, $4, $5, $6, $7)
@@ -52,7 +52,7 @@ func (p *Pgx) CreatePost(ctx context.Context, post *model.APost) (string, error)
 		post.Age,
 		post.Sex,
 		post.Description,
-		post.PhotoURL,
+		post.PhotoURLs,
 		post.Status,
 	).Scan(&id)
 
@@ -91,7 +91,7 @@ func (p *Pgx) DeletePost(ctx context.Context, id string) error {
 
 func (p *Pgx) GetPost(ctx context.Context, limit, offset int) ([]model.APost, error) {
 	query := `
-        SELECT id, organization_id, name, age, sex, description, photo_url, status, created_at, updated_at
+        SELECT id, organization_id, name, age, sex, description, photo_urls, status, created_at, updated_at
         FROM animals
         WHERE deleted_at IS NULL
         ORDER BY created_at DESC
@@ -106,7 +106,7 @@ func (p *Pgx) GetPost(ctx context.Context, limit, offset int) ([]model.APost, er
 	var animals []model.APost
 	for rows.Next() {
 		var a model.APost
-		err := rows.Scan(&a.ID, &a.OrganizationID, &a.Name, &a.Age, &a.Sex, &a.Description, &a.PhotoURL, &a.Status, &a.CreatedAt, &a.UpdatedAt)
+		err := rows.Scan(&a.ID, &a.OrganizationID, &a.Name, &a.Age, &a.Sex, &a.Description, &a.PhotoURLs, &a.Status, &a.CreatedAt, &a.UpdatedAt)
 		if err != nil {
 			return nil, err
 		}
@@ -115,14 +115,14 @@ func (p *Pgx) GetPost(ctx context.Context, limit, offset int) ([]model.APost, er
 	return animals, rows.Err()
 }
 
-func (p *Pgx) UpdatePost(ctx context.Context, name, age, sex, description string, photo_url *string, post_id string) error {
+func (p *Pgx) UpdatePost(ctx context.Context, name, age, sex, description string, photo_urls []string, post_id string) error {
 	query := `
        UPDATE animals 
-       SET name = $1, age = $2, sex = $3, description = $4, photo_url = $5, updated_at = NOW()
+       SET name = $1, age = $2, sex = $3, description = $4, photo_urls = $5, updated_at = NOW()
        WHERE id = $6
     `
 
-	tag, err := p.pool.Exec(ctx, query, name, age, sex, description, photo_url, post_id)
+	tag, err := p.pool.Exec(ctx, query, name, age, sex, description, photo_urls, post_id)
 	if err != nil {
 		return err
 	}

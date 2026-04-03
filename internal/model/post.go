@@ -25,7 +25,7 @@ type APost struct {
 	Age            string
 	Sex            ASex
 	Description    string
-	PhotoURL       *string
+	PhotoURLs      []string
 	Status         AStatus
 	CreatedAt      time.Time
 	UpdatedAt      time.Time
