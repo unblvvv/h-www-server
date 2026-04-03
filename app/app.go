@@ -82,9 +82,9 @@ func New() *fx.App {
 	)
 }
 
-func startServer(lc fx.Lifecycle, r *gin.Engine) {
+func startServer(lc fx.Lifecycle, r *gin.Engine, cfg *config.Config) {
 	srv := &http.Server{
-		Addr:    ":8080",
+		Addr:    cfg.Port,
 		Handler: r,
 	}
 
