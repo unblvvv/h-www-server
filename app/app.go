@@ -10,7 +10,7 @@ import (
 	"github.com/danielgtaylor/huma/v2/adapters/humagin"
 	"github.com/gin-gonic/gin"
 	"github.com/unblvvv/h-www-server/internal/config"
-	"github.com/unblvvv/h-www-server/repository"
+	"github.com/unblvvv/h-www-server/internal/repository"
 	"go.uber.org/fx"
 )
 
