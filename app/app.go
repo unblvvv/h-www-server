@@ -84,7 +84,7 @@ func New() *fx.App {
 
 func startServer(lc fx.Lifecycle, r *gin.Engine, cfg *config.Config) {
 	srv := &http.Server{
-		Addr:    cfg.Port,
+		Addr:    ":" + cfg.Port,
 		Handler: r,
 	}
 

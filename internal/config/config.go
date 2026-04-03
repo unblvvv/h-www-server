@@ -53,7 +53,7 @@ func Load() (*Config, error) {
 		DSN:       dsn,
 		JWTSecret: os.Getenv("JWT_SECRET"),
 
-		Port: getEnv("PORT", ":8080"),
+		Port: getEnv("PORT", "8080"),
 
 		R2AccessKey: os.Getenv("R2_ACCESS_KEY"),
 		R2SecretKey: os.Getenv("R2_SECRET_KEY"),
