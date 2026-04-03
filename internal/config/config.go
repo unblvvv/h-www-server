@@ -12,6 +12,12 @@ type Config struct {
 	Database  DatabaseConfig
 	DSN       string
 	JWTSecret string
+	
+	R2AccessKey string
+	R2SecretKey string
+	R2Endpoint  string
+	R2Bucket    string
+	R2PublicURL string
 }
 
 type DatabaseConfig struct {
@@ -44,6 +50,12 @@ func Load() (*Config, error) {
 		Database:  databaseConfig,
 		DSN:       dsn,
 		JWTSecret: os.Getenv("JWT_SECRET"),
+
+		R2AccessKey: os.Getenv("R2_ACCESS_KEY"),
+		R2SecretKey: os.Getenv("R2_SECRET_KEY"),
+		R2Endpoint:  os.Getenv("R2_ENDPOINT"),
+		R2Bucket:    os.Getenv("R2_BUCKET"),
+		R2PublicURL: os.Getenv("R2_PUBLIC_URL"),
 	}
 
 	return cfg, nil

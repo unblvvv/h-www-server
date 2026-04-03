@@ -52,7 +52,7 @@ func (s *Post) GetMeta() huma.Operation {
 func (s *Post) Handler(ctx context.Context, input *CreateAnimalRequestDto) (*CreatePostOutput, error) {
 	userID, ok := ctx.Value("userID").(string)
 	if !ok {
-		return nil, huma.Error401Unauthorized("Не авторизован")
+		return nil, huma.Error401Unauthorized("unauthorized")
 	}
 
 	id, err := s.service.CreateAPost(

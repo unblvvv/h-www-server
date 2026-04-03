@@ -17,7 +17,9 @@ type LoginRequestDto struct {
 
 type LoginResponseOutput struct {
 	Body struct {
-		Token string `json:"token" doc:"jwt token"`
+		Token    string `json:"token" doc:"jwt token"`
+		Username string `json:"username" doc:"username"`
+		Email    string `json:"email" doc:"email"`
 	}
 }
 
@@ -41,16 +43,20 @@ func (s *Login) GetMeta() huma.Operation {
 }
 
 func (s *Login) Handler(ctx context.Context, input *LoginRequestDto) (*LoginResponseOutput, error) {
-	token, err := s.service.GenerateToken(ctx, input.Body.Email, input.Body.Password)
+	token, user, err := s.service.GenerateToken(ctx, input.Body.Email, input.Body.Password)
 	if err != nil {
 		return nil, huma.Error401Unauthorized("Invalid email or password", err)
 	}
 
 	return &LoginResponseOutput{
 		Body: struct {
-			Token string `json:"token" doc:"jwt token"`
+			Token    string `json:"token" doc:"jwt token"`
+			Username string `json:"username" doc:"username"`
+			Email    string `json:"email" doc:"email"`
 		}{
-			Token: token,
+			Token:    token,
+			Username: user.Username,
+			Email:    user.Email,
 		},
 	}, nil
 }

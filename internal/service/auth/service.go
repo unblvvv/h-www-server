@@ -39,15 +39,15 @@ func (s *AuthService) CreateUser(ctx context.Context, user model.User) (string, 
 	return s.repo.CreateUser(ctx, user)
 }
 
-func (s *AuthService) GenerateToken(ctx context.Context, email, password string) (string, error) {
+func (s *AuthService) GenerateToken(ctx context.Context, email, password string) (string, *model.User, error) {
 	user, err := s.repo.GetUserByEmail(ctx, email)
 	if err != nil {
-		return "", err
+		return "", nil, err
 	}
 
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
 	if err != nil {
-		return "", err
+		return "", nil, err
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &tokenClaims{
@@ -59,7 +59,12 @@ func (s *AuthService) GenerateToken(ctx context.Context, email, password string)
 		},
 	})
 
-	return token.SignedString([]byte(s.cfg.JWTSecret))
+	tokenString, err := token.SignedString([]byte(s.cfg.JWTSecret))
+	if err != nil {
+		return "", nil, err
+	}
+
+	return tokenString, user, nil
 }
 
 func (s *AuthService) generatePasswordHash(password string) (string, error) {

@@ -14,4 +14,5 @@ type Opts struct {
 
 var FxModule = fx.Provide(
 	handler.AsFxRoute(NewListPost),
+	handler.AsFxRoute(NewUpload),
 )

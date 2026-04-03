@@ -21,6 +21,7 @@ import (
 	"github.com/unblvvv/h-www-server/internal/repository/post"
 	authservice "github.com/unblvvv/h-www-server/internal/service/auth"
 	postservice "github.com/unblvvv/h-www-server/internal/service/post"
+	"github.com/unblvvv/h-www-server/internal/service/storage"
 	"go.uber.org/fx"
 )
 
@@ -42,6 +43,7 @@ func New() *fx.App {
 
 			authservice.New,
 			postservice.New,
+			storage.New,
 
 			NewHumaAPI,
 
@@ -59,9 +61,11 @@ func New() *fx.App {
 				return r
 			},
 		),
+
 		authhandler.FxModule,
 		posthandler.FxModule,
 		admin.FxModule,
+
 		fx.Invoke(
 			startServer,
 			handler.RegisterRoutes,
@@ -91,7 +95,13 @@ func startServer(lc fx.Lifecycle, r *gin.Engine) {
 }
 
 func NewHumaAPI(r *gin.Engine, cfg *config.Config) huma.API {
-	humaConfig := huma.DefaultConfig("BiteWay API", "1.0.0")
+	humaConfig := huma.DefaultConfig("hwww", "1.0.0")
+
+	humaConfig.Formats["multipart/form-data"] = huma.Format{
+		Unmarshal: func(data []byte, v any) error {
+			return nil
+		},
+	}
 
 	humaConfig.Components.SecuritySchemes = map[string]*huma.SecurityScheme{
 		"bearer": {
