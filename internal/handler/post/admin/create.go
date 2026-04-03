@@ -1,4 +1,4 @@
-package post
+package admin
 
 import (
 	"context"
@@ -40,12 +40,11 @@ func (s *Post) GetMeta() huma.Operation {
 	return huma.Operation{
 		OperationID: "animal-posts",
 		Method:      "POST",
-		Path:        "/animal/create",
-		Tags:        []string{"Posts"},
+		Path:        "/admin/animal/create",
+		Tags:        []string{"admin"},
 		Description: "Create a new animal post",
-
 		Security: []map[string][]string{
-			{"bearer": {}},
+			{"admin_bearer": {}},
 		},
 	}
 }
@@ -53,7 +52,7 @@ func (s *Post) GetMeta() huma.Operation {
 func (s *Post) Handler(ctx context.Context, input *CreateAnimalRequestDto) (*CreatePostOutput, error) {
 	userID, ok := ctx.Value("userID").(string)
 	if !ok {
-		return nil, huma.Error401Unauthorized("unauthorized")
+		return nil, huma.Error401Unauthorized("Не авторизован")
 	}
 
 	id, err := s.service.CreateAPost(
@@ -68,7 +67,7 @@ func (s *Post) Handler(ctx context.Context, input *CreateAnimalRequestDto) (*Cre
 	)
 
 	if err != nil {
-		return nil, huma.Error500InternalServerError("Ошибка при добавлении животного", err)
+		return nil, huma.Error500InternalServerError("internal server error", err)
 	}
 
 	return &CreatePostOutput{
@@ -77,7 +76,7 @@ func (s *Post) Handler(ctx context.Context, input *CreateAnimalRequestDto) (*Cre
 			Message string `json:"message"`
 		}{
 			ID:      id,
-			Message: "Животное успешно добавлено в базу",
+			Message: "Post created successfully",
 		},
 	}, nil
 }

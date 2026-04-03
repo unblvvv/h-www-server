@@ -14,6 +14,7 @@ import (
 	"github.com/unblvvv/h-www-server/internal/handler"
 	authhandler "github.com/unblvvv/h-www-server/internal/handler/auth"
 	posthandler "github.com/unblvvv/h-www-server/internal/handler/post"
+	"github.com/unblvvv/h-www-server/internal/handler/post/admin"
 	"github.com/unblvvv/h-www-server/internal/middleware"
 	"github.com/unblvvv/h-www-server/internal/repository"
 	"github.com/unblvvv/h-www-server/internal/repository/auth"
@@ -60,6 +61,7 @@ func New() *fx.App {
 		),
 		authhandler.FxModule,
 		posthandler.FxModule,
+		admin.FxModule,
 		fx.Invoke(
 			startServer,
 			handler.RegisterRoutes,
@@ -93,6 +95,11 @@ func NewHumaAPI(r *gin.Engine, cfg *config.Config) huma.API {
 
 	humaConfig.Components.SecuritySchemes = map[string]*huma.SecurityScheme{
 		"bearer": {
+			Type:         "http",
+			Scheme:       "bearer",
+			BearerFormat: "JWT",
+		},
+		"admin_bearer": {
 			Type:         "http",
 			Scheme:       "bearer",
 			BearerFormat: "JWT",

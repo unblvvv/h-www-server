@@ -19,7 +19,7 @@ type RegisterRequestDto struct {
 
 type RegisterResponseOutput struct {
 	Body struct {
-		Token string `json:"token" doc:"jwt token"`
+		Id string `json:"id" doc:"id"`
 	}
 }
 
@@ -61,9 +61,9 @@ func (s *Register) Handler(ctx context.Context, input *RegisterRequestDto) (*Reg
 
 	return &RegisterResponseOutput{
 		Body: struct {
-			Token string `json:"token" doc:"jwt token"`
+			Id string `json:"id" doc:"id"`
 		}{
-			Token: id,
+			Id: id,
 		},
 	}, nil
 }

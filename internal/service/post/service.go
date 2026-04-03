@@ -17,7 +17,7 @@ func New(repo post.Repository) *Service {
 	}
 }
 
-func (s *Service) CreateAPost(ctx context.Context, orgID string, name string, age string,
+func (s *Service) CreateAPost(ctx context.Context, orgID, name string, age string,
 	sex model.ASex, description string, photoURL *string, status model.AStatus) (string, error) {
 	newAnimal := &model.APost{
 		OrganizationID: orgID,
@@ -32,12 +32,12 @@ func (s *Service) CreateAPost(ctx context.Context, orgID string, name string, ag
 	return s.repo.CreatePost(ctx, newAnimal)
 }
 
-func (s *Service) Update(ctx context.Context, post model.APost, userId string) error {
-	return s.repo.UpdatePost(ctx, post.Name, post.Age, string(post.Sex), post.Description, post.PhotoURL, post.ID, userId)
+func (s *Service) Delete(ctx context.Context, id string) error {
+	return s.repo.DeletePost(ctx, id)
 }
 
-func (s *Service) Delete(ctx context.Context, id, userID string) error {
-	return s.repo.DeletePost(ctx, id, userID)
+func (s *Service) Update(ctx context.Context, p model.APost) error {
+	return s.repo.UpdatePost(ctx, p.Name, p.Age, string(p.Sex), p.Description, p.PhotoURL, p.ID)
 }
 
 func (s *Service) GetAll(ctx context.Context, limit, offset int) ([]model.APost, error) {

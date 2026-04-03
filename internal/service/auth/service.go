@@ -25,6 +25,7 @@ func New(repo auth.Repository, cfg *config.Config) *AuthService {
 
 type tokenClaims struct {
 	UserID string `json:"user_id"`
+	Role   string `json:"role"`
 	jwt.RegisteredClaims
 }
 
@@ -51,6 +52,7 @@ func (s *AuthService) GenerateToken(ctx context.Context, email, password string)
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &tokenClaims{
 		UserID: user.ID,
+		Role:   user.Role,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),

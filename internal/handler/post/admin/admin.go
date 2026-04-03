@@ -1,4 +1,4 @@
-package post
+package admin
 
 import (
 	"github.com/danielgtaylor/huma/v2"
@@ -13,5 +13,7 @@ type Opts struct {
 }
 
 var FxModule = fx.Provide(
-	handler.AsFxRoute(NewListPost),
+	handler.AsFxRoute(NewPost),
+	handler.AsFxRoute(NewDeletePost),
+	handler.AsFxRoute(NewUpdate),
 )

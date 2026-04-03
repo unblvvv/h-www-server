@@ -1,4 +1,4 @@
-package post
+package admin
 
 import (
 	"context"
@@ -36,20 +36,15 @@ func NewUpdate(s *postservice.Service) *Update {
 
 func (s *Update) GetMeta() huma.Operation {
 	return huma.Operation{
-		OperationID: "update-animal",
+		OperationID: "admin-update-animal",
 		Method:      "PUT",
-		Path:        "animal/update/{id}",
-		Tags:        []string{"Posts"},
-		Security:    []map[string][]string{{"bearer": {}}},
+		Path:        "/admin/animal/update/{id}",
+		Tags:        []string{"admin"},
+		Security:    []map[string][]string{{"admin_bearer": {}}},
 	}
 }
 
 func (s *Update) Handler(ctx context.Context, input *UpdatePostRequestDto) (*UpdatePostOutput, error) {
-	userID, ok := ctx.Value("userID").(string)
-	if !ok {
-		return nil, huma.Error401Unauthorized("unauthorized")
-	}
-
 	p := model.APost{
 		ID:          input.ID,
 		Name:        input.Body.Name,
@@ -60,15 +55,15 @@ func (s *Update) Handler(ctx context.Context, input *UpdatePostRequestDto) (*Upd
 		Status:      input.Body.Status,
 	}
 
-	if err := s.service.Update(ctx, p, userID); err != nil {
-		return nil, huma.Error403Forbidden("forbidden", err)
+	if err := s.service.Update(ctx, p); err != nil {
+		return nil, huma.Error500InternalServerError("internal server error", err)
 	}
 
 	return &UpdatePostOutput{
 		Body: struct {
 			Message string `json:"message"`
 		}{
-			Message: "Животное успешно добавлено в базу",
+			Message: "Post updated successfully",
 		},
 	}, nil
 }

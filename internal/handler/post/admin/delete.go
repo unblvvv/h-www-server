@@ -1,4 +1,4 @@
-package post
+package admin
 
 import (
 	"context"
@@ -29,25 +29,20 @@ func NewDeletePost(service *postservice.Service, repo post.Repository) *DeletePo
 
 func (s *DeletePost) GetMeta() huma.Operation {
 	return huma.Operation{
-		OperationID: "delete-animal-post",
+		OperationID: "admin-delete-animal",
 		Method:      "DELETE",
-		Path:        "/animal/delete/{id}",
-		Tags:        []string{"Posts"},
+		Path:        "/admin/animal/delete/{id}",
+		Tags:        []string{"admin"},
 		Description: "Delete an animal post",
 		Security: []map[string][]string{
-			{"bearer": {}},
+			{"admin_bearer": {}},
 		},
 	}
 }
 
 func (s *DeletePost) Handler(ctx context.Context, input *DeleteAnimalRequestDto) (*DeletePostOutput, error) {
-	userID, ok := ctx.Value("userID").(string)
-	if !ok {
-		return nil, huma.Error401Unauthorized("unauthorized")
-	}
-
-	if err := s.service.Delete(ctx, input.ID, userID); err != nil {
-		return nil, huma.Error403Forbidden("forbidden", err)
+	if err := s.service.Delete(ctx, input.ID); err != nil {
+		return nil, huma.Error500InternalServerError("internal server error", err)
 	}
 
 	return &DeletePostOutput{

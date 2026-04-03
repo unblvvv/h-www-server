@@ -46,7 +46,7 @@ func (p *Pgx) CreateUser(ctx context.Context, user model.User) (string, error) {
 
 func (p *Pgx) GetUserByEmail(ctx context.Context, email string) (*model.User, error) {
 	query := `
-       SELECT id, email, username, password_hash
+       SELECT id, email, username, password_hash, role
        FROM users WHERE email = $1
     `
 	var user model.User
@@ -56,6 +56,7 @@ func (p *Pgx) GetUserByEmail(ctx context.Context, email string) (*model.User, er
 		&user.Email,
 		&user.Username,
 		&user.Password,
+		&user.Role,
 	)
 
 	if err != nil {

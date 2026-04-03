@@ -63,16 +63,16 @@ func (p *Pgx) CreatePost(ctx context.Context, post *model.APost) (string, error)
 	return id, nil
 }
 
-func (p *Pgx) DeletePost(ctx context.Context, id, userId string) error {
-	query := `DELETE FROM animals WHERE id = $1 AND organization_id = $2`
+func (p *Pgx) DeletePost(ctx context.Context, id string) error {
+	query := `DELETE FROM animals WHERE id = $1`
 
-	tag, err := p.pool.Exec(ctx, query, id, userId)
+	tag, err := p.pool.Exec(ctx, query, id)
 	if err != nil {
 		return err
 	}
 
 	if tag.RowsAffected() == 0 {
-		return errors.New("post not found or user not authorized to delete")
+		return errors.New("post not found")
 	}
 
 	return nil
@@ -103,20 +103,20 @@ func (p *Pgx) GetPost(ctx context.Context, limit, offset int) ([]model.APost, er
 	return animals, rows.Err()
 }
 
-func (p *Pgx) UpdatePost(ctx context.Context, name, age, sex, description string, photo_url *string, post_id, userId string) error {
+func (p *Pgx) UpdatePost(ctx context.Context, name, age, sex, description string, photo_url *string, post_id string) error {
 	query := `
        UPDATE animals 
        SET name = $1, age = $2, sex = $3, description = $4, photo_url = $5, updated_at = NOW()
-       WHERE id = $6 AND organization_id = $7
+       WHERE id = $6
     `
 
-	tag, err := p.pool.Exec(ctx, query, name, age, sex, description, photo_url, post_id, userId)
+	tag, err := p.pool.Exec(ctx, query, name, age, sex, description, photo_url, post_id)
 	if err != nil {
 		return err
 	}
 
 	if tag.RowsAffected() == 0 {
-		return errors.New("post not found or user not authorized to delete")
+		return errors.New("post not found")
 	}
 
 	return nil
